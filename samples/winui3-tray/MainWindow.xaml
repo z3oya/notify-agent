@@ -9,8 +9,11 @@
     mc:Ignorable="d"
     Title="notify-agent">
 
-  <Grid>
-  <ScrollViewer>
+  <Grid x:Name="RootGrid">
+    <Grid.RenderTransform>
+      <TranslateTransform x:Name="RootTranslate" />
+    </Grid.RenderTransform>
+
     <StackPanel Margin="16" Spacing="14" MaxWidth="400">
 
       <TextBlock Text="示例组件" Style="{ThemeResource SubtitleTextBlockStyle}" />
@@ -40,7 +43,6 @@
       </StackPanel>
 
     </StackPanel>
-  </ScrollViewer>
 
     <tb:TaskbarIcon
         x:Name="TrayIcon"

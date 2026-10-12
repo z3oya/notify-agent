@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 
@@ -46,7 +47,7 @@ public sealed partial class MainWindow : Window
         presenter.IsMinimizable = false;
         SystemBackdrop = new MicaBackdrop();
 
-        AppWindow.Resize(new SizeInt32(420, 390));
+        AppWindow.Resize(new SizeInt32(420, 500));
         PlaceAtBottomRight();
 
         BuildMenus();
@@ -63,8 +64,7 @@ public sealed partial class MainWindow : Window
                 : 0;
             if (foregroundThread == GetCurrentThreadId())
                 return; // focus is on one of our own popups (e.g. the open tray menu)
-            AppWindow.Hide();
-            UpdateTrayMenuState();
+            HidePanel();
         };
 
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
@@ -92,7 +92,7 @@ public sealed partial class MainWindow : Window
     private void BuildMenus()
     {
         _showItem.Command = new DelegateCommand(ShowFromTray);
-        _hideItem.Command = new DelegateCommand(() => AppWindow.Hide());
+        _hideItem.Command = new DelegateCommand(HidePanel);
         _exitItem.Command = new DelegateCommand(ExitApplication);
         _trayMenu.Items.Add(_showItem);
         _trayMenu.Items.Add(_hideItem);
@@ -153,7 +153,7 @@ public sealed partial class MainWindow : Window
         _deactivateTimer.Stop();
         if (AppWindow.IsVisible)
         {
-            AppWindow.Hide();
+            HidePanel();
         }
         else
         {
@@ -195,6 +195,75 @@ public sealed partial class MainWindow : Window
         BringToFront();
         Activate();
         Content?.Focus(FocusState.Programmatic);
+        PlayShowAnimation();
+    }
+
+    private void PlayShowAnimation()
+    {
+        var fade = new DoubleAnimation
+        {
+            From = 0,
+            To = 1,
+            Duration = new Duration(TimeSpan.FromMilliseconds(170)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+        };
+        Storyboard.SetTarget(fade, RootGrid);
+        Storyboard.SetTargetProperty(fade, "Opacity");
+
+        var slide = new DoubleAnimation
+        {
+            From = 24,
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(170)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut },
+        };
+        Storyboard.SetTarget(slide, RootTranslate);
+        Storyboard.SetTargetProperty(slide, "Y");
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(fade);
+        storyboard.Children.Add(slide);
+        storyboard.Begin();
+    }
+
+    private bool _hiding;
+
+    private void HidePanel()
+    {
+        if (_hiding || !AppWindow.IsVisible)
+            return;
+
+        _hiding = true;
+        var fade = new DoubleAnimation
+        {
+            From = 1,
+            To = 0,
+            Duration = new Duration(TimeSpan.FromMilliseconds(150)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
+        };
+        Storyboard.SetTarget(fade, RootGrid);
+        Storyboard.SetTargetProperty(fade, "Opacity");
+
+        var slide = new DoubleAnimation
+        {
+            From = 0,
+            To = 16,
+            Duration = new Duration(TimeSpan.FromMilliseconds(150)),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseIn },
+        };
+        Storyboard.SetTarget(slide, RootTranslate);
+        Storyboard.SetTargetProperty(slide, "Y");
+
+        var storyboard = new Storyboard();
+        storyboard.Children.Add(fade);
+        storyboard.Children.Add(slide);
+        storyboard.Completed += (_, _) =>
+        {
+            _hiding = false;
+            AppWindow.Hide();
+            UpdateTrayMenuState();
+        };
+        storyboard.Begin();
     }
 
     private void OnFloatingToggled(object sender, RoutedEventArgs e)
