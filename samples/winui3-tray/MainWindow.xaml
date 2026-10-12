@@ -30,7 +30,7 @@
         <ComboBoxItem>高</ComboBoxItem>
       </ComboBox>
 
-      <ToggleSwitch Header="启用代理" OnContent="开" OffContent="关" />
+      <ToggleSwitch x:Name="FloatingToggle" Header="悬浮窗" OnContent="开" OffContent="关" Toggled="OnFloatingToggled" />
 
       <CheckBox Content="开机自启" />
 

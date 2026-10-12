@@ -27,6 +27,8 @@ public sealed partial class MainWindow : Window
     private readonly DispatcherQueueTimer _deactivateTimer =
         DispatcherQueue.GetForCurrentThread().CreateTimer();
 
+    private FloatingBar? _floatingBar;
+
     private readonly MenuFlyout _trayMenu = new();
     private readonly MenuFlyoutItem _showItem = new() { Text = "显示" };
     private readonly MenuFlyoutItem _hideItem = new() { Text = "隐藏" };
@@ -193,6 +195,26 @@ public sealed partial class MainWindow : Window
         BringToFront();
         Activate();
         Content?.Focus(FocusState.Programmatic);
+    }
+
+    private void OnFloatingToggled(object sender, RoutedEventArgs e)
+    {
+        if (((ToggleSwitch)sender).IsOn)
+        {
+            _floatingBar ??= new FloatingBar();
+            _floatingBar.CloseRequested -= OnFloatingCloseRequested;
+            _floatingBar.CloseRequested += OnFloatingCloseRequested;
+            _floatingBar.ShowFloating();
+        }
+        else
+        {
+            _floatingBar?.AppWindow.Hide();
+        }
+    }
+
+    private void OnFloatingCloseRequested()
+    {
+        FloatingToggle.IsOn = false;
     }
 
     private void ExitApplication()
