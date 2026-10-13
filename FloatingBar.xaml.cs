@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Windows.Graphics;
 
-namespace NotifyAgent.WinUI3;
+namespace NotifyAgent;
 
 public sealed partial class FloatingBar : Window
 {
@@ -31,7 +31,6 @@ public sealed partial class FloatingBar : Window
         SystemBackdrop = new MicaBackdrop();
 
         AppWindow.Resize(new SizeInt32(280, 64));
-        PlaceTopRight();
 
         var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(this);
         _hwnd = hwnd;
@@ -39,7 +38,11 @@ public sealed partial class FloatingBar : Window
         SetWindowLongPtr(hwnd, GWL_EXSTYLE, new IntPtr(exStyle | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE));
     }
 
-    internal void ShowFloating() => ShowWindowNative(_hwnd, SW_SHOWNA);
+    internal void ShowFloating()
+    {
+        PlaceTopRight();
+        ShowWindowNative(_hwnd, SW_SHOWNA);
+    }
 
     private void PlaceTopRight()
     {

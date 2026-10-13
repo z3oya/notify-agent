@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Window
-    x:Class="NotifyAgent.WinUI3.MainWindow"
+    x:Class="NotifyAgent.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -23,7 +23,7 @@
           IsClosable="False"
           Severity="Informational"
           Title="notify-agent"
-          Message="WinUI3 示例窗口" />
+          Message="主面板" />
 
       <TextBox Header="名称" PlaceholderText="在此输入" />
 
@@ -41,6 +41,8 @@
         <Button Content="标准按钮" />
         <Button Content="强调按钮" Style="{ThemeResource AccentButtonStyle}" />
       </StackPanel>
+
+      <Button Content="退出" HorizontalAlignment="Right" Click="OnExitClick" />
 
     </StackPanel>
 

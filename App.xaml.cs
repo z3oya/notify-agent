@@ -1,12 +1,12 @@
 using System.Threading;
 using Microsoft.UI.Xaml;
 
-namespace NotifyAgent.WinUI3;
+namespace NotifyAgent;
 
 public partial class App : Application
 {
-    private const string SingleInstanceMutexName = @"Local\NotifyAgent.WinUI3.SingleInstance";
-    private const string ShowPanelEventName = @"Local\NotifyAgent.WinUI3.ShowPanel";
+    private const string SingleInstanceMutexName = @"Local\NotifyAgent.SingleInstance";
+    private const string ShowPanelEventName = @"Local\NotifyAgent.ShowPanel";
 
     private static Mutex? _singleInstanceMutex;
 

@@ -9,7 +9,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
 
-namespace NotifyAgent.WinUI3;
+namespace NotifyAgent;
 
 public sealed partial class MainWindow : Window
 {
@@ -33,7 +33,6 @@ public sealed partial class MainWindow : Window
     private readonly MenuFlyout _trayMenu = new();
     private readonly MenuFlyoutItem _showItem = new() { Text = "显示" };
     private readonly MenuFlyoutItem _hideItem = new() { Text = "隐藏" };
-    private readonly MenuFlyoutItem _exitItem = new() { Text = "退出" };
 
     public MainWindow()
     {
@@ -93,10 +92,8 @@ public sealed partial class MainWindow : Window
     {
         _showItem.Command = new DelegateCommand(ShowFromTray);
         _hideItem.Command = new DelegateCommand(HidePanel);
-        _exitItem.Command = new DelegateCommand(ExitApplication);
         _trayMenu.Items.Add(_showItem);
         _trayMenu.Items.Add(_hideItem);
-        _trayMenu.Items.Add(_exitItem);
 
         TrayIcon.ContextFlyout = _trayMenu;
         UpdateTrayMenuState();
@@ -191,6 +188,7 @@ public sealed partial class MainWindow : Window
 
     internal void ShowPanel()
     {
+        PlaceAtBottomRight();
         ShowWindowNative(_hwnd, SW_SHOWNA);
         BringToFront();
         Activate();
@@ -286,8 +284,22 @@ public sealed partial class MainWindow : Window
         FloatingToggle.IsOn = false;
     }
 
-    private void ExitApplication()
+    private void OnExitClick(object sender, RoutedEventArgs e) => ExitApplication();
+
+    private async void ExitApplication()
     {
+        var dialog = new ContentDialog
+        {
+            XamlRoot = Content.XamlRoot,
+            Title = "退出 notify-agent",
+            Content = "确定要退出吗?退出后托盘图标也会关闭。",
+            PrimaryButtonText = "退出",
+            CloseButtonText = "取消",
+            DefaultButton = ContentDialogButton.Close,
+        };
+        if (await dialog.ShowAsync() != ContentDialogResult.Primary)
+            return;
+
         _exitRequested = true;
         TrayIcon.Dispose();
         Close();
