@@ -29,6 +29,7 @@ public sealed partial class MainWindow : Window
         DispatcherQueue.GetForCurrentThread().CreateTimer();
 
     private FloatingBar? _floatingBar;
+    private SettingsWindow? _settingsWindow;
 
     private readonly MenuFlyout _trayMenu = new();
     private readonly MenuFlyoutItem _showItem = new() { Text = "显示" };
@@ -47,7 +48,7 @@ public sealed partial class MainWindow : Window
         SystemBackdrop = new MicaBackdrop();
 
         AppWindow.Resize(new SizeInt32(420, 500));
-        PlaceAtBottomRight();
+        PlaceAtBottomRight(); // 覆盖启动首显路径(OnLaunched 的 Activate 不走 ShowPanel)
 
         BuildMenus();
 
@@ -285,6 +286,16 @@ public sealed partial class MainWindow : Window
     }
 
     private void OnExitClick(object sender, RoutedEventArgs e) => ExitApplication();
+
+    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    {
+        if (_settingsWindow is null)
+        {
+            _settingsWindow = new SettingsWindow();
+            _settingsWindow.Closed += (_, _) => _settingsWindow = null;
+        }
+        _settingsWindow.Activate();
+    }
 
     private async void ExitApplication()
     {

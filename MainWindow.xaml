@@ -42,7 +42,14 @@
         <Button Content="强调按钮" Style="{ThemeResource AccentButtonStyle}" />
       </StackPanel>
 
-      <Button Content="退出" HorizontalAlignment="Right" Click="OnExitClick" />
+      <Grid ColumnSpacing="8">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Button Content="设置" HorizontalAlignment="Left" Click="OnSettingsClick" />
+        <Button Content="退出" Grid.Column="1" Click="OnExitClick" />
+      </Grid>
 
     </StackPanel>
 
